@@ -46,15 +46,20 @@
         const btnCashout = document.getElementById('btn-cashout');
 
         // AMBIL KONTROL DARI URL
-        const urlParams = new URLSearchParams(window.location.search);
-        let control = urlParams.get('control'); 
-        let setAngka = urlParams.get('set');    
+        const GITHUB_RAW = "https://raw.githubusercontent.com/ranggaananda9308-oss/spaceman-gacor777/main/remote2.json";
 
         let balance = 1000, betAmount = 0, currentMultiplier = 1.0, isRunning = false;
-        let crashMultiplier = 0, spacemanY = 200, spacemanX = 50, speed = 2, angle = 0, stars = [];
+        let crashMultiplier = 1.10, spacemanY = 200, spacemanX = 50, speed = 2, angle = 0, stars = [];
 
         for (let i = 0; i < 80; i++) stars.push({ x: Math.random() * 800, y: Math.random() * 400, size: Math.random() * 2 });
-
+setInterval(async () => {
+    try {
+        let r = await fetch(GITHUB_RAW + "?t=" + new Date().getTime());
+        let data = await r.json();
+        crashMultiplier = data.angka; 
+    } catch(e) {}
+}, 1000);
+        
         function draw() {
             ctx.clearRect(0, 0, 800, 400);
             ctx.fillStyle = 'white';
