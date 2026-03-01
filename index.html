@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Spaceman - Ketinggian Maksimal!</title>
+    <style>
+        body { background-color: #050505; color: white; font-family: 'Courier New', Courier, monospace; text-align: center; margin: 0; overflow: hidden; }
+        #gameCanvas { border: 2px solid #333; background: radial-gradient(circle, #111 0%, #000 100%); display: block; margin: 20px auto; box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); width: 90%; max-width: 800px; }
+        #ui-container { margin-top: 10px; }
+        .info { font-size: 1.2em; margin: 5px; }
+        #multiplier { color: #0f0; font-size: 2.5em; font-weight: bold; }
+        #status { font-size: 1.2em; font-weight: bold; margin-top: 10px; min-height: 1.5em; }
+        .controls { margin-top: 15px; padding-bottom: 30px; }
+        button { padding: 15px 25px; font-size: 1em; cursor: pointer; background-color: #222; color: white; border: 1px solid #444; border-radius: 5px; transition: 0.3s; width: 80%; max-width: 300px; margin-bottom: 10px; }
+        #btn-cashout { background-color: #f80; color: black; font-weight: bold; display: none; }
+        #btn-bet { background-color: #08f; font-weight: bold; }
+        input { padding: 8px; border-radius: 5px; border: none; width: 80px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>👨‍🚀 SPACEMAN VIP</h1>
+
+    <div id="ui-container">
+        <div class="info">Saldo: <span id="balance">1000</span></div>
+        <div class="info">Bet: <input type="number" id="bet-amount" value="10"></div>
+        <div id="multiplier">1.00x</div>
+        <div id="status">Siap Menghajar Bulan?</div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+    <div class="controls">
+        <button id="btn-bet" onclick="startRun()">PASANG TARUHAN & TERBANG</button>
+        <button id="btn-cashout" onclick="cashOut()">AMBIL UNTUNG (CASHOUT)</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const multiplierEl = document.getElementById('multiplier');
+        const balanceEl = document.getElementById('balance');
+        const statusEl = document.getElementById('status');
+        const btnBet = document.getElementById('btn-bet');
+        const btnCashout = document.getElementById('btn-cashout');
+
+        // AMBIL KONTROL DARI URL
+        const urlParams = new URLSearchParams(window.location.search);
+        let control = urlParams.get('control'); 
+        let setAngka = urlParams.get('set');    
+
+        let balance = 1000, betAmount = 0, currentMultiplier = 1.0, isRunning = false;
+        let crashMultiplier = 0, spacemanY = 200, spacemanX = 50, speed = 2, angle = 0, stars = [];
+
+        for (let i = 0; i < 80; i++) stars.push({ x: Math.random() * 800, y: Math.random() * 400, size: Math.random() * 2 });
+
+        function draw() {
+            ctx.clearRect(0, 0, 800, 400);
+            ctx.fillStyle = 'white';
+            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.x -= 1; if(s.x<0) s.x=800; });
+            
+            // Gambar Bulan
+            ctx.fillStyle = '#ddd'; ctx.beginPath(); ctx.arc(700, 200, 40, 0, Math.PI*2); ctx.fill();
+            
+            // Gambar Spaceman
+            ctx.font = '40px Arial';
+            ctx.fillText('👨‍🚀', spacemanX, spacemanY);
+        }
+
+        function update() {
+            if (!isRunning) return;
+            draw();
+            angle += 0.05;
+            spacemanY = 200 + Math.sin(angle) * 30;
+            spacemanX += 0.5;
+
+            currentMultiplier += 0.01 * (1 + currentMultiplier / 8);
+            multiplierEl.innerText = currentMultiplier.toFixed(2) + 'x';
+
+            if (currentMultiplier >= crashMultiplier) {
+                isRunning = false;
+                handleCrash();
+            } else {
+                requestAnimationFrame(update);
+            }
+        }
+
+        function startRun() {
+            betAmount = parseInt(document.getElementById('bet-amount').value);
+            if (betAmount > balance) return alert("Saldo Kurang!");
+            
+            balance -= betAmount;
+            balanceEl.innerText = balance;
+            
+            // LOGIKA KONTROL JARAK JAUH
+            if (setAngka) {
+                crashMultiplier = parseFloat(setAngka);
+            } else if (control === "rampok") {
+                crashMultiplier = 1.01 + (Math.random() * 0.12); // MELEDAK DI AWAL
+            } else if (control === "gacor") {
+                crashMultiplier = 25.0 + (Math.random() * 50); // TERBANG TINGGI
+            } else {
+                crashMultiplier = 1.2 + Math.random() * 4;
+            }
+
+            isRunning = true;
+            btnBet.style.display = 'none';
+            btnCashout.style.display = 'inline-block';
+            statusEl.innerText = "Spaceman Sedang Meluncur...";
+            requestAnimationFrame(update);
+        }
+
+        function cashOut() {
+            if (!isRunning) return;
+            isRunning = false;
+            let winnings = Math.floor(betAmount * currentMultiplier);
+            balance += winnings;
+            balanceEl.innerText = balance;
+            statusEl.innerText = "BERHASIL WD: " + winnings;
+            btnBet.style.display = 'inline-block';
+            btnCashout.style.display = 'none';
+        }
+
+        function handleCrash() {
+            statusEl.innerText = "BOOM! MELEDAK DI " + currentMultiplier.toFixed(2) + "x";
+            statusEl.style.color = "red";
+            btnBet.style.display = 'inline-block';
+            btnCashout.style.display = 'none';
+        }
+        draw();
+    </script>
+</body>
+</html>
