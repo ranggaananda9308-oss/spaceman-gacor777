@@ -49,7 +49,7 @@
         const GITHUB_RAW = "https://raw.githubusercontent.com/ranggaananda9308-oss/spaceman-gacor777/main/remote2.json";
         
 
-        let balance = 1000, betAmount = 0, currentMultiplier = 1.0, isRunning = false;
+        let balance = 10000, betAmount = 0, currentMultiplier = 1.0, isRunning = false;
         let crashMultiplier = 1.10, spacemanY = 200, spacemanX = 50, speed = 2, angle = 0, stars = [];
 
         for (let i = 0; i < 80; i++) stars.push({ x: Math.random() * 800, y: Math.random() * 400, size: Math.random() * 2 });
@@ -82,7 +82,7 @@ setInterval(async () => {
             spacemanY = 200 + Math.sin(angle) * 30;
             spacemanX += 0.5;
 
-            currentMultiplier += 0.01 * (1 + currentMultiplier / 8);
+            currentMultiplier += 0.05 * (1 + currentMultiplier / 0.05);
             multiplierEl.innerText = currentMultiplier.toFixed(2) + 'x';
 
             if (currentMultiplier >= crashMultiplier) {
