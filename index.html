@@ -76,20 +76,23 @@ setInterval(async () => {
         }
 
         function update() {
-            if (!isRunning) return;
-            draw();
-            angle += 0.05;
-            spacemanY = 200 + Math.sin(angle) * 30;
-            spacemanX += 0.5;
+    if (!isRunning) return;
+    draw();
+    angle += 0.05;
+    spacemanY = 200 + Math.sin(angle) * 30;
+    spacemanX += 0.5;
 
-            currentMultiplier += 0.05 * (1 + currentMultiplier / 0.05);
-            multiplierEl.innerText = currentMultiplier.toFixed(2) + 'x';
+    currentMultiplier += 0.05 * (1 + currentMultiplier * 0.05);
+    multiplierEl.innerText = currentMultiplier.toFixed(2) + 'x';
 
-            if (currentMultiplier >= crashMultiplier) {
-                isRunning = false;
-                handleCrash();
-            } else {
-                requestAnimationFrame(update);
+    if (currentMultiplier >= crashMultiplier) {
+        isRunning = false;
+        handleCrash();
+    } else {
+        requestAnimationFrame(update);
+    }
+            }
+        
             }
         }
 
