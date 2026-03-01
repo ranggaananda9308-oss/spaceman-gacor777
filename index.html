@@ -60,6 +60,7 @@ setInterval(async () => {
     } catch(e) {}
 }, 1000);
         
+        
         function draw() {
             ctx.clearRect(0, 0, 800, 400);
             ctx.fillStyle = 'white';
@@ -99,15 +100,7 @@ setInterval(async () => {
             balanceEl.innerText = balance;
             
             // LOGIKA KONTROL JARAK JAUH
-            if (setAngka) {
-                crashMultiplier = parseFloat(setAngka);
-            } else if (control === "rampok") {
-                crashMultiplier = 1.01 + (Math.random() * 0.12); // MELEDAK DI AWAL
-            } else if (control === "gacor") {
-                crashMultiplier = 25.0 + (Math.random() * 50); // TERBANG TINGGI
-            } else {
-                crashMultiplier = 1.2 + Math.random() * 4;
-            }
+            
 
             isRunning = true;
             btnBet.style.display = 'none';
